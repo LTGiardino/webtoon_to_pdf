@@ -1,0 +1,15 @@
+#!/bin/bash
+season=$1
+init="https://www.webtoons.com/en/fantasy/tower-of-god/season-$season-ep-1/viewer?title_no=95&episode_no="
+name=$(echo $init | awk -F'/' '{print $6}' | tr '-' '_')
+
+for epi in $(seq $2 $3); do
+	printf "⟩$epi/$3:\r"
+	link_epi="https://www.webtoons.com/en/fantasy/tower-of-god/season-$season-ep-$epi/viewer?title_no=95&episode_no=$epi"
+	# link_epi="$init$epi"
+	printf "\tSearching episode images\r"
+	links=$(wget $link_epi -q -O - | grep 'class="_images"' | sed -e 's/.*data-url="\(\S*\)".*/\1/' | tr '\n' ' ')
+	printf "\tDownloading images                    \r"
+	python webtoon.py $link_epi $links
+	printf "\tEpisode finished!                    \r"
+done
